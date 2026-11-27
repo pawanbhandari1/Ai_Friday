@@ -134,6 +134,11 @@ async function startServer() {
     });
   });
 
+  app.get('/download/AetherPharma_Jury_Presentation.pptx', (_req: Request, res: Response) => {
+    const filePath = path.resolve(__dirname, 'AetherPharma_Jury_Presentation.pptx');
+    res.download(filePath, 'AetherPharma_Jury_Presentation.pptx');
+  });
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
