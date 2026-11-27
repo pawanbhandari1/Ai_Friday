@@ -1,0 +1,6 @@
+{
+  "name": "AetherPharma Quality Assistant",
+  "description": "GMP-compliant generative AI quality issue explanation and batch deviation copilot for pharmaceutical manufacturing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,75 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    transition: background-color 200ms cubic-bezier(0.16, 1, 0.3, 1), color 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-mono, .tabular-nums {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Enterprise iOS / visionOS Frosted Glass Surfaces */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 36px -12px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 44px -16px rgba(2, 6, 23, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-surface-subtle {
+  background: rgba(248, 250, 252, 0.72);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.dark .glass-surface-subtle {
+  background: rgba(30, 41, 59, 0.52);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Atmospheric Cleanroom / Midnight Slate Mesh Backdrop */
+.cleanroom-mesh-bg {
+  background-color: #f1f5f9;
+  background-image:
+    radial-gradient(at 14% 12%, rgba(14, 165, 233, 0.12) 0px, transparent 52%),
+    radial-gradient(at 86% 18%, rgba(37, 99, 235, 0.09) 0px, transparent 48%),
+    radial-gradient(at 50% 92%, rgba(20, 184, 166, 0.08) 0px, transparent 50%);
+}
+
+.dark .cleanroom-mesh-bg {
+  background-color: #070b14;
+  background-image:
+    radial-gradient(at 15% 10%, rgba(14, 165, 233, 0.16) 0px, transparent 50%),
+    radial-gradient(at 85% 16%, rgba(59, 130, 246, 0.12) 0px, transparent 46%),
+    radial-gradient(at 50% 90%, rgba(15, 118, 110, 0.12) 0px, transparent 52%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
