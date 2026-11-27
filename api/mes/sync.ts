@@ -1,12 +1,12 @@
-import type { Request, Response } from 'express';
+import { sendJson, type CompatRequest, type CompatResponse } from '../_lib/http.js';
 
-export default function handler(req: Request, res: Response) {
+export default function handler(req: CompatRequest, res: CompatResponse) {
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
+    sendJson(res, 405, { error: 'Method not allowed' });
     return;
   }
 
-  res.status(200).json({
+  sendJson(res, 200, {
     syncedAt: new Date().toISOString(),
     connectors: [
       { name: 'MES OPC-UA SCADA Bridge', status: 'Connected', recordsPolled: 148 },

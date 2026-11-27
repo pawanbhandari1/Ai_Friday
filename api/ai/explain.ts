@@ -1,23 +1,23 @@
-import type { Request, Response } from 'express';
-import { generateRootCauseExplanation } from '../../server/aiEngine';
-import { BatchDefectAlert, UserRole } from '../../src/types/pharma';
+import { generateRootCauseExplanation } from '../_lib/aiEngine.js';
+import { readJsonBody, sendJson, type CompatRequest, type CompatResponse } from '../_lib/http.js';
+import type { BatchDefectAlert, UserRole } from '../../src/types/pharma.js';
 
-export default async function handler(req: Request, res: Response) {
+export default async function handler(req: CompatRequest, res: CompatResponse) {
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
+    sendJson(res, 405, { error: 'Method not allowed' });
     return;
   }
 
   try {
-    const rawBody = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    const { defect, role, privacyShieldEnabled } = (rawBody || {}) as {
+    const body = await readJsonBody(req);
+    const { defect, role, privacyShieldEnabled } = body as {
       defect?: BatchDefectAlert;
       role?: UserRole;
       privacyShieldEnabled?: boolean;
     };
 
     if (!defect || !defect.id || !Array.isArray(defect.cppParameters)) {
-      res.status(400).json({ error: 'Invalid batch defect payload.' });
+      sendJson(res, 400, { error: 'Invalid batch defect payload.' });
       return;
     }
 
@@ -27,9 +27,9 @@ export default async function handler(req: Request, res: Response) {
       safeRole,
       privacyShieldEnabled !== false
     );
-    res.status(200).json(explanation);
+    sendJson(res, 200, explanation);
   } catch (err) {
-    res.status(500).json({
+    sendJson(res, 500, {
       error: err instanceof Error ? err.message : 'Failed to generate AI explanation.',
     });
   }

@@ -1,23 +1,23 @@
-import type { Request, Response } from 'express';
-import { parseCsvBatchPayload, parseJsonBatchPayload } from '../../server/ingestParser';
-import { BatchDefectAlert } from '../../src/types/pharma';
+import { readJsonBody, sendJson, type CompatRequest, type CompatResponse } from '../_lib/http.js';
+import { parseCsvBatchPayload, parseJsonBatchPayload } from '../_lib/ingestParser.js';
+import type { BatchDefectAlert } from '../../src/types/pharma.js';
 
-export default function handler(req: Request, res: Response) {
+export default async function handler(req: CompatRequest, res: CompatResponse) {
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
+    sendJson(res, 405, { error: 'Method not allowed' });
     return;
   }
 
   try {
-    const rawBody = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    const { format, content } = (rawBody || {}) as { format?: string; content?: string };
+    const body = await readJsonBody(req);
+    const { format, content } = body as { format?: string; content?: string };
 
     if (typeof content !== 'string' || content.trim().length === 0) {
-      res.status(400).json({ valid: false, error: 'File content cannot be empty.' });
+      sendJson(res, 400, { valid: false, error: 'File content cannot be empty.' });
       return;
     }
     if (content.length > 250_000) {
-      res.status(413).json({ valid: false, error: 'Uploaded payload exceeds 250 KB safety limit.' });
+      sendJson(res, 413, { valid: false, error: 'Uploaded payload exceeds 250 KB safety limit.' });
       return;
     }
 
@@ -29,9 +29,9 @@ export default function handler(req: Request, res: Response) {
       parsedAlert = parseJsonBatchPayload(jsonObj);
     }
 
-    res.status(200).json({ valid: true, alert: parsedAlert });
+    sendJson(res, 200, { valid: true, alert: parsedAlert });
   } catch (err) {
-    res.status(400).json({
+    sendJson(res, 400, {
       valid: false,
       error: err instanceof Error ? err.message : 'Schema validation failed.',
     });

@@ -1,17 +1,17 @@
-import type { Request, Response } from 'express';
-import { generateChatResponse } from '../../server/aiEngine';
-import { sanitizeString } from '../../server/ingestParser';
-import { BatchDefectAlert, ChatMessage, UserRole } from '../../src/types/pharma';
+import { generateChatResponse } from '../_lib/aiEngine.js';
+import { readJsonBody, sendJson, type CompatRequest, type CompatResponse } from '../_lib/http.js';
+import { sanitizeString } from '../_lib/ingestParser.js';
+import type { BatchDefectAlert, ChatMessage, UserRole } from '../../src/types/pharma.js';
 
-export default async function handler(req: Request, res: Response) {
+export default async function handler(req: CompatRequest, res: CompatResponse) {
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
+    sendJson(res, 405, { error: 'Method not allowed' });
     return;
   }
 
   try {
-    const rawBody = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    const { defect, role, message, history, privacyShieldEnabled } = (rawBody || {}) as {
+    const body = await readJsonBody(req);
+    const { defect, role, message, history, privacyShieldEnabled } = body as {
       defect?: BatchDefectAlert;
       role?: UserRole;
       message?: string;
@@ -21,7 +21,7 @@ export default async function handler(req: Request, res: Response) {
 
     const cleanMessage = sanitizeString(message, 600);
     if (!defect || !cleanMessage) {
-      res.status(400).json({ error: 'Defect context and question message are required.' });
+      sendJson(res, 400, { error: 'Defect context and question message are required.' });
       return;
     }
 
@@ -33,9 +33,9 @@ export default async function handler(req: Request, res: Response) {
       Array.isArray(history) ? history : [],
       privacyShieldEnabled !== false
     );
-    res.status(200).json(reply);
+    sendJson(res, 200, reply);
   } catch (err) {
-    res.status(500).json({
+    sendJson(res, 500, {
       error: err instanceof Error ? err.message : 'Failed to generate copilot reply.',
     });
   }

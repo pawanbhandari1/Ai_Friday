@@ -1,8 +1,8 @@
-import type { Request, Response } from 'express';
+import { sendJson, type CompatRequest, type CompatResponse } from './_lib/http.js';
 
-export default function handler(req: Request, res: Response) {
+export default function handler(req: CompatRequest, res: CompatResponse) {
   if (req.method && req.method !== 'GET') {
-    res.status(405).json({ error: 'Method not allowed' });
+    sendJson(res, 405, { error: 'Method not allowed' });
     return;
   }
 
@@ -11,7 +11,7 @@ export default function handler(req: Request, res: Response) {
       (process.env.LLM_API_KEY && process.env.LLM_API_KEY !== 'MY_GEMINI_API_KEY')
   );
 
-  res.status(200).json({
+  sendJson(res, 200, {
     status: 'ok',
     aiMode: hasKey ? 'live-llm-with-gmp-fallback' : 'deterministic-gmp-engine',
     timestamp: new Date().toISOString(),

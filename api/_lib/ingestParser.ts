@@ -1,8 +1,8 @@
-import {
+import type {
   BatchDefectAlert,
   CppParameterSpec,
   CppTelemetryPoint,
-} from '../src/types/pharma';
+} from '../../src/types/pharma.js';
 
 export function sanitizeString(input: unknown, maxLen = 400): string {
   if (typeof input !== 'string') return '';

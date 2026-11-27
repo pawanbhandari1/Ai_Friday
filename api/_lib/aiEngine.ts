@@ -1,11 +1,11 @@
 import { GoogleGenAI, Type } from '@google/genai';
-import {
+import type {
   AiExplanationPayload,
   BatchDefectAlert,
   ChatMessage,
   CorrectiveStep,
   UserRole,
-} from '../src/types/pharma';
+} from '../../src/types/pharma.js';
 
 function getValidApiKey(): { provider: 'gemini' | 'openai' | 'none'; key: string } {
   const llmKey = (process.env.LLM_API_KEY || '').trim();
@@ -38,7 +38,7 @@ export function buildDeterministicExplanation(
 ): AiExplanationPayload {
   const drifts = getChronologicalDrifts(defect);
   const firstDrift = drifts[0] ?? defect.cppParameters[0];
-  const topCapa = defect.historicalCapas[0];
+  const topCapa = defect.historicalCapas?.[0];
   const redactedFields = privacyShieldEnabled
     ? ['API Compound Name', 'Excipient Formulation Ratio', 'Proprietary Thermal/Binder Spec']
     : [];
@@ -207,14 +207,13 @@ export function buildDeterministicExplanation(
       },
     ];
   } else {
-    // Generic dynamic deterministic fallback for uploaded or resolved defects
     const oosList = defect.cppParameters.filter((p) => p.isOutOfSpec);
     plainLanguageSummary =
-      oosList.length > 0
+      oosList.length > 0 && firstDrift
         ? `Process sensor ${firstDrift.name} moved outside its normal safe zone (${firstDrift.goldenMin}–${firstDrift.goldenMax} ${firstDrift.unit}) starting at ${firstDrift.firstDriftTimestamp}. Bring ${firstDrift.name} back to ${firstDrift.targetNominal} ${firstDrift.unit} and inspect recent product before continuing.`
         : `All monitored machine parameters for ${defect.batchLotNumber} are currently within golden-batch control limits (${defect.severity}).`;
     qaTechnicalSummary =
-      oosList.length > 0
+      oosList.length > 0 && firstDrift
         ? `Multivariate CPP correlation isolated ${firstDrift.name} excursion at ${firstDrift.firstDriftTimestamp} (${firstDrift.currentValue} ${firstDrift.unit}, Z=${firstDrift.zScore}, Cpk=${firstDrift.cpk}) correlating with ${defect.defectTitle}.`
         : `Post-correction verification confirms Cpk >= 1.48 across critical parameters for ${defect.batchLotNumber}.`;
     recommendedHoldAction =
@@ -234,7 +233,7 @@ export function buildDeterministicExplanation(
         id: 'step-2',
         priority: 'Verification',
         operatorInstruction: `Restore ${firstDrift?.name ?? 'primary CPP'} to ${firstDrift?.targetNominal ?? 'nominal'} ${firstDrift?.unit ?? ''}.`,
-        qaTechnicalDetail: `Return parameter inside validated golden-batch range (${firstDrift?.goldenMin}–${firstDrift?.goldenMax} ${firstDrift?.unit}).`,
+        qaTechnicalDetail: `Return parameter inside validated golden-batch range (${firstDrift?.goldenMin ?? 0}–${firstDrift?.goldenMax ?? 100} ${firstDrift?.unit ?? ''}).`,
         gmpReference: `MBR-${defect.lineId}`,
         requiresDualSignOff: false,
       },
@@ -444,7 +443,7 @@ export function buildDeterministicChatReply(
   const drifts = getChronologicalDrifts(defect);
   const firstDrift = drifts[0] ?? defect.cppParameters[0];
   const secondDrift = drifts[1];
-  const topCapa = defect.historicalCapas[0];
+  const topCapa = defect.historicalCapas?.[0];
   const explanation = buildDeterministicExplanation(defect, role, true);
 
   if (q.includes('first') || q.includes('drifted') || q.includes('which machine parameter')) {
@@ -517,7 +516,6 @@ export function buildDeterministicChatReply(
     };
   }
 
-  // Custom question dynamic handler
   return {
     text:
       `For **${defect.defectTitle}** on **${defect.batchLotNumber}** (${defect.equipmentName}):\n\n` +
@@ -581,7 +579,7 @@ export async function generateChatResponse(
           text,
           citations: [
             defect.deviationId,
-            defect.historicalCapas[0]?.capaId ?? defect.defectCode,
+            defect.historicalCapas?.[0]?.capaId ?? defect.defectCode,
           ],
           sourceEngine: 'gemini',
         };
@@ -612,7 +610,7 @@ export async function generateChatResponse(
         if (text) {
           return {
             text,
-            citations: [defect.deviationId, defect.historicalCapas[0]?.capaId ?? defect.defectCode],
+            citations: [defect.deviationId, defect.historicalCapas?.[0]?.capaId ?? defect.defectCode],
             sourceEngine: 'gemini',
           };
         }

@@ -3,20 +3,20 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
-import {
+import type {
   BatchDefectAlert,
   ChatMessage,
   UserRole,
-} from './src/types/pharma';
+} from './src/types/pharma.js';
 import {
   generateChatResponse,
   generateRootCauseExplanation,
-} from './server/aiEngine';
+} from './api/_lib/aiEngine.js';
 import {
   parseCsvBatchPayload,
   parseJsonBatchPayload,
   sanitizeString,
-} from './server/ingestParser';
+} from './api/_lib/ingestParser.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
