@@ -216,6 +216,10 @@ export const DefectCopilotWorkspace: React.FC<DefectCopilotWorkspaceProps> = ({
           privacyShieldEnabled,
         }),
       });
+      if (!res.ok) {
+        const errPayload = await res.json().catch(() => ({}));
+        throw new Error((errPayload as { error?: string }).error || `HTTP ${res.status}`);
+      }
       const data = (await res.json()) as {
         text: string;
         citations?: string[];
@@ -234,11 +238,12 @@ export const DefectCopilotWorkspace: React.FC<DefectCopilotWorkspaceProps> = ({
         ...prev,
         [selectedAlert.id]: [...nextHistory, aiMsg],
       }));
-    } catch {
+    } catch (err) {
+      const detail = err instanceof Error ? ` (${err.message})` : '';
       const errMsg: ChatMessage = {
         id: `err-${Date.now()}`,
         sender: 'assistant',
-        text: 'Connection interrupted while querying GMP Copilot. Please retry.',
+        text: `Unable to reach GMP Copilot service${detail}. Please retry.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setChatHistoryByDefect((prev) => ({
