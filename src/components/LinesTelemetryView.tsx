@@ -4,6 +4,8 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -12,14 +14,26 @@ import {
 import { PRODUCTION_LINES } from '../data/pharmaSeed';
 import { BatchDefectAlert } from '../types/pharma';
 
+export interface PlantStreamPoint {
+  timestamp: string;
+  'LINE-01': number;
+  'LINE-02': number;
+  'LINE-03': number;
+  'LINE-04': number;
+}
+
 interface LinesTelemetryViewProps {
   alerts: BatchDefectAlert[];
+  plantStream: PlantStreamPoint[];
+  liveStreamEnabled: boolean;
   isDark: boolean;
   onJumpToAlert: (alertId: string) => void;
 }
 
 export const LinesTelemetryView: React.FC<LinesTelemetryViewProps> = ({
   alerts,
+  plantStream,
+  liveStreamEnabled,
   isDark,
   onJumpToAlert,
 }) => {
@@ -30,6 +44,8 @@ export const LinesTelemetryView: React.FC<LinesTelemetryViewProps> = ({
     withAi: line.meanResolutionMinWithAi,
     scrapSavedK: Math.round(line.scrapSavedUsd / 1000),
   }));
+
+  const latestPlantPt = plantStream[plantStream.length - 1];
 
   return (
     <div className="space-y-5">
@@ -45,6 +61,10 @@ export const LinesTelemetryView: React.FC<LinesTelemetryViewProps> = ({
               ? 'text-amber-600 dark:text-amber-400'
               : 'text-emerald-600 dark:text-emerald-400';
           const glyph = status === 'Critical Hold' ? '✖' : status === 'Warning' ? '▲' : '●';
+          const liveOee =
+            latestPlantPt && line.lineId in latestPlantPt
+              ? Number(latestPlantPt[line.lineId as keyof PlantStreamPoint])
+              : line.oeePct;
 
           return (
             <div
@@ -76,9 +96,9 @@ export const LinesTelemetryView: React.FC<LinesTelemetryViewProps> = ({
                   </div>
                 </div>
                 <div>
-                  <div className="text-slate-500 dark:text-slate-400">Line OEE</div>
+                  <div className="text-slate-500 dark:text-slate-400">Live Line OEE</div>
                   <div className="font-mono font-medium text-slate-900 dark:text-white mt-0.5">
-                    {line.oeePct.toFixed(1)}%
+                    {liveOee.toFixed(1)}%
                   </div>
                 </div>
               </div>
@@ -97,7 +117,101 @@ export const LinesTelemetryView: React.FC<LinesTelemetryViewProps> = ({
         })}
       </section>
 
-      {/* Cross-Line Charts */}
+      {/* Live Multi-Line SCADA Stability & OEE Telemetry Stream */}
+      <section className="glass-panel rounded-[22px] p-5 sm:p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-display text-base font-semibold text-slate-900 dark:text-white">
+                Real-Time Multi-Line SCADA Stability & OEE Stream
+              </h3>
+              {liveStreamEnabled && (
+                <span className="inline-flex items-center gap-1 font-mono text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  LIVE
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Continuous 1.8s rolling OPC-UA telemetry across Tablet Compression, Granulation, Sterile Vial Filling, and Blister Inspection
+            </p>
+          </div>
+          <span className="font-mono text-xs text-slate-500 dark:text-slate-400">
+            Window: {plantStream.length} ticks
+          </span>
+        </div>
+
+        <div className="h-64 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={plantStream} margin={{ top: 10, right: 16, left: 0, bottom: 4 }}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke={isDark ? 'rgba(148,163,184,0.14)' : 'rgba(15,23,42,0.08)'}
+              />
+              <XAxis
+                dataKey="timestamp"
+                tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#64748b' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                domain={[65, 100]}
+                tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#64748b' }}
+                axisLine={false}
+                tickLine={false}
+                unit="%"
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: isDark ? 'rgba(15, 23, 42, 0.94)' : 'rgba(255, 255, 255, 0.96)',
+                  borderColor: isDark ? 'rgba(255,255,255,0.14)' : 'rgba(15,23,42,0.1)',
+                  borderRadius: '12px',
+                  fontSize: '12px',
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: '12px' }} />
+              <Line
+                type="monotone"
+                dataKey="LINE-01"
+                name="Line 1 (Tablet Press)"
+                stroke="#f43f5e"
+                strokeWidth={2.2}
+                isAnimationActive={false}
+                dot={{ r: 2.5 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="LINE-02"
+                name="Line 2 (Fluid-Bed Dryer)"
+                stroke="#f59e0b"
+                strokeWidth={2.2}
+                isAnimationActive={false}
+                dot={{ r: 2.5 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="LINE-03"
+                name="Line 3 (Sterile Isolator)"
+                stroke="#0ea5e9"
+                strokeWidth={2.2}
+                isAnimationActive={false}
+                dot={{ r: 2.5 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="LINE-04"
+                name="Line 4 (Blister Vision)"
+                stroke="#10b981"
+                strokeWidth={2.2}
+                isAnimationActive={false}
+                dot={{ r: 2.5 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </section>
+
+      {/* Cross-Line Comparison Charts */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div className="glass-panel rounded-[22px] p-5 sm:p-6 space-y-4">
           <div>

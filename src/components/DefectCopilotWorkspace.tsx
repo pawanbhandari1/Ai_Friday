@@ -41,6 +41,7 @@ interface DefectCopilotWorkspaceProps {
   currentUser: DemoUser;
   privacyShieldEnabled: boolean;
   isDark: boolean;
+  liveStreamEnabled: boolean;
   onResolveAlert: (id: string) => void;
   onSubmitFeedback: (entry: FeedbackEntry) => void;
   feedbackEntries: FeedbackEntry[];
@@ -93,6 +94,7 @@ export const DefectCopilotWorkspace: React.FC<DefectCopilotWorkspaceProps> = ({
   currentUser,
   privacyShieldEnabled,
   isDark,
+  liveStreamEnabled,
   onResolveAlert,
   onSubmitFeedback,
   feedbackEntries,
@@ -488,8 +490,14 @@ export const DefectCopilotWorkspace: React.FC<DefectCopilotWorkspaceProps> = ({
             <div className="pt-4 border-t border-slate-200/80 dark:border-white/10 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <div className="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                    Correlated MES & SCADA Process Parameter Telemetry
+                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-800 dark:text-slate-200">
+                    <span>Correlated MES & SCADA Process Parameter Telemetry</span>
+                    {liveStreamEnabled && (
+                      <span className="inline-flex items-center gap-1 font-mono text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        LIVE
+                      </span>
+                    )}
                   </div>
                   <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                     Shaded band marks validated Golden-Batch limits ({activeParam.goldenMin}–
@@ -591,6 +599,7 @@ export const DefectCopilotWorkspace: React.FC<DefectCopilotWorkspaceProps> = ({
                       stroke={activeParam.isOutOfSpec ? '#f43f5e' : '#0ea5e9'}
                       strokeWidth={2.5}
                       fill="url(#cppFill)"
+                      isAnimationActive={false}
                       dot={{ r: 3 }}
                       activeDot={{ r: 5 }}
                     />
