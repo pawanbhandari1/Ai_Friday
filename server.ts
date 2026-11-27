@@ -139,6 +139,16 @@ async function startServer() {
     res.download(filePath, 'AetherPharma_Jury_Presentation.pptx');
   });
 
+  app.get('/download/demo_sterile_lyo_vacuum_deviation.json', (_req: Request, res: Response) => {
+    const filePath = path.resolve(__dirname, 'demo_sterile_lyo_vacuum_deviation.json');
+    res.download(filePath, 'demo_sterile_lyo_vacuum_deviation.json');
+  });
+
+  app.get('/download/demo_tablet_coating_temp.csv', (_req: Request, res: Response) => {
+    const filePath = path.resolve(__dirname, 'demo_tablet_coating_temp.csv');
+    res.download(filePath, 'demo_tablet_coating_temp.csv');
+  });
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },

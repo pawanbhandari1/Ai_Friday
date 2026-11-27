@@ -1,0 +1,54 @@
+{
+  "deviationId": "DEV-2026-0512",
+  "lineId": "LINE-03",
+  "lineName": "Line 3: Sterile Vial Filling & Lyophilization",
+  "equipmentName": "IMA Edwards Lyofast Freeze Dryer #02",
+  "batchLotNumber": "LOT-VANC-4408A",
+  "drugSku": "Vancomycin HCl 1 g Lyophilized Sterile Powder for Injection",
+  "defectCode": "QC-LYO-VAC-09",
+  "defectTitle": "Lyophilization Primary Drying Vacuum Excursion",
+  "severity": "Critical Hold",
+  "batchHoldRisk": "Severe — Melt-Back & Cake Collapse Risk (USP <788>)",
+  "batchValueAtRiskUsd": 285000,
+  "inspectionSummary": "Pirani vs. capacitance manometer pressure differential widened to 48 mTorr during hour 14 of primary drying, risking amorphous cake melt-back across Shelf #04–#07.",
+  "limsContext": "Moisture headspace pre-check trending 2.9% vs. 2.0% release ceiling; sterile HEPA integrity verified nominal.",
+  "mesBatchStage": "Primary Sublimation Drying · Cycle Step 3/5",
+  "expectedResolutionMin": 21,
+  "cppParameters": [
+    {
+      "id": "chamberVacuum",
+      "name": "Chamber Absolute Vacuum",
+      "unit": "mTorr",
+      "goldenMin": 90,
+      "goldenMax": 120,
+      "targetNominal": 105,
+      "currentValue": 168,
+      "firstDriftTimestamp": "14:04",
+      "cpk": 0.54,
+      "zScore": 3.5
+    },
+    {
+      "id": "condenserTemp",
+      "name": "Ice Condenser Coil Temp",
+      "unit": "°C",
+      "goldenMin": -78,
+      "goldenMax": -68,
+      "targetNominal": -73,
+      "currentValue": -61,
+      "firstDriftTimestamp": "14:02",
+      "cpk": 0.63,
+      "zScore": 2.9
+    }
+  ],
+  "telemetrySeries": [
+    { "timestamp": "13:50", "chamberVacuum": 104, "condenserTemp": -73.2 },
+    { "timestamp": "13:53", "chamberVacuum": 105, "condenserTemp": -73.0 },
+    { "timestamp": "13:56", "chamberVacuum": 106, "condenserTemp": -72.6 },
+    { "timestamp": "13:59", "chamberVacuum": 111, "condenserTemp": -71.1 },
+    { "timestamp": "14:02", "chamberVacuum": 126, "condenserTemp": -66.8 },
+    { "timestamp": "14:05", "chamberVacuum": 144, "condenserTemp": -64.2 },
+    { "timestamp": "14:08", "chamberVacuum": 157, "condenserTemp": -62.5 },
+    { "timestamp": "14:11", "chamberVacuum": 164, "condenserTemp": -61.4 },
+    { "timestamp": "14:14", "chamberVacuum": 168, "condenserTemp": -61.0 }
+  ]
+}

@@ -1,0 +1,9 @@
+batchLotNumber,defectTitle,lineName,drugSku,cppName,cppUnit,goldenMin,goldenMax,timestamp,cppValue
+LOT-ATOR-9310B,Tablet Film-Coating Twinning & Orange-Peel,Line 1: High-Speed Tablet Compression,Atorvastatin 20 mg Opadry II Film-Coated,Exhaust Bed Temperature,°C,42.0,46.0,13:52,44.1
+LOT-ATOR-9310B,Tablet Film-Coating Twinning & Orange-Peel,Line 1: High-Speed Tablet Compression,Atorvastatin 20 mg Opadry II Film-Coated,Exhaust Bed Temperature,°C,42.0,46.0,13:55,43.9
+LOT-ATOR-9310B,Tablet Film-Coating Twinning & Orange-Peel,Line 1: High-Speed Tablet Compression,Atorvastatin 20 mg Opadry II Film-Coated,Exhaust Bed Temperature,°C,42.0,46.0,13:58,43.2
+LOT-ATOR-9310B,Tablet Film-Coating Twinning & Orange-Peel,Line 1: High-Speed Tablet Compression,Atorvastatin 20 mg Opadry II Film-Coated,Exhaust Bed Temperature,°C,42.0,46.0,14:01,41.4
+LOT-ATOR-9310B,Tablet Film-Coating Twinning & Orange-Peel,Line 1: High-Speed Tablet Compression,Atorvastatin 20 mg Opadry II Film-Coated,Exhaust Bed Temperature,°C,42.0,46.0,14:04,39.8
+LOT-ATOR-9310B,Tablet Film-Coating Twinning & Orange-Peel,Line 1: High-Speed Tablet Compression,Atorvastatin 20 mg Opadry II Film-Coated,Exhaust Bed Temperature,°C,42.0,46.0,14:07,38.5
+LOT-ATOR-9310B,Tablet Film-Coating Twinning & Orange-Peel,Line 1: High-Speed Tablet Compression,Atorvastatin 20 mg Opadry II Film-Coated,Exhaust Bed Temperature,°C,42.0,46.0,14:10,37.6
+LOT-ATOR-9310B,Tablet Film-Coating Twinning & Orange-Peel,Line 1: High-Speed Tablet Compression,Atorvastatin 20 mg Opadry II Film-Coated,Exhaust Bed Temperature,°C,42.0,46.0,14:13,36.9
